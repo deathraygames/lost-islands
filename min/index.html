@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>&AElig;LBAHKAT Exploration Game</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="styles/lost.css" />
+</head>
+<body>
+<div id="title">
+	<h1>&AElig;LBAHKAT</h1>
+	<div class="sub">The Lost Islands</div>
+	<p class="credits">
+	By Luke @deathraygames for js13k 2017
+	</p>
+</div>
+<div id="win" style="display:none">
+	You enter the red moon gate and teleport home.
+	<p class="winBig">YOU WIN!<i>&#9765;</i></p>
+</div>
+<div id="loading">
+	<i class="spin">&#9765;</i>
+	Loading...
+</div>
+<div id="body">
+	<canvas id="g"></canvas>
+	<div id="what"></div>
+	<div id="verb"></div>
+	<div id="time"></div>
+	<div id="inventory">
+		<h2>Inventory</h2>
+		<ul id="items">
+		</ul>
+		<h2>Virtues</h2>
+		<ul id="virtues">
+		</ul>
+		<div id="virtueCount"></div>
+		<h2>People</h2>
+		<div id="people"></div>
+		<h2>Tips</h2>
+		<ul id="tips">
+			<li>Move with arrow keys or WASD</li>
+			<li>[I] or [Tab] to toggle this inventory</li>
+			<li>[E] or [Space] will do actions when near people or objects</li>
+			<li>[M] to meditate</li>
+			<li>[+] &amp; [-] to zoom</li>
+			<li>Boats, coats, and water will increase your speed on the seas, mountains, and deserts</li>
+			<li>Tents will speed up time [E] when not near anything</li>
+			<li>Your goal is to explore: find all shrines, a mystic, and a way to leave</li>
+		</ul>
+	</div>	
+</div>
+<script src="game.min.js"></script>
+<script>
+	var g = new Game();
+	g.start();
+</script>
+</body>
+</html>
