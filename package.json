@@ -1,9 +1,9 @@
 {
-  "name": "lost",
-  "version": "0.1.0",
-  "description": "RPG",
+  "name": "Aelbahkat: The Lost Islands",
+  "version": "1.0.0",
+  "description": "Exploration Game",
   "keywords": [
-    "js13k"
+    "js13k", "rpg"
   ],
   "author": "Luke Nickerson",
   "license": "MIT",
