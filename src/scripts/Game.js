@@ -78,7 +78,9 @@ class Game {
 		let o = this;
 		let h = '';
 		for (let item in o.pc.inventory) {
-			h += '<li>' + item + '</li>';
+			if (o.pc.inventory[item]) {
+				h += '<li>' + item + '</li>';
+			}
 		}
 		o.itemsElt.innerHTML = h;
 		h = '';
