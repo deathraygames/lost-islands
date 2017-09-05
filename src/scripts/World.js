@@ -33,29 +33,103 @@ class World {
 		let o = this;
 		let jobTrades = [
 			// helpers
-			{job: "farmer", trades: {"grain": "free"}},
-			{job: "well-digger", trades: {"water": "free"}},
-			{job: "hunter", trades: {"hide": "free"}},
-			{job: "lumberjack", trades: {"wood": "free"}},
-			{job: "bard", trades: {"song": "free"}},
+			{	job: "farmer", trades: {"grain": "free"},
+				gossip: [
+					"The crops grow really well here.",
+					"This island is our new home."
+				]
+			},
+			{	job: "well-digger", trades: {"water": "free"},
+				gossip: [
+					"There are strange artifacts deep in the ground.",
+					"If you have some water you needn't fear the deserts."
+				]
+			},
+			{	job: "hunter", trades: {"hides": "free"},
+				gossip: [
+					"Hunting the elusive beasts of this land requires skill and patience.",
+					"If only we could move the island..."
+				]
+			},
+			{	job: "lumberjack", trades: {"wood": "free"},
+				gossip: [
+					"I keep cutting down trees, but the forest stays exactly the same!",
+					"The wood from these trees is great for making boats."
+				]
+			},
+			{	job: "bard", trades: {"song": "free"},
+				gossip: [
+					"Sadly I've forgotten my old songs.",
+					"My next song will be about you, Stranger."
+				]
+			},
 			// traders
-			{job: "shepherd", trades: {"wool": "grain"}},
-			{job: "torchbearer", trades: {"torch": "bread"}},
-			{job: "baker", trades: {"bread": "grain"}},
-			{job: "messenger", trades: {"tent": "bread"}},
+			{	job: "shepherd", trades: {"wool": "grain"},
+				gossip: [
+					"Good luck out there!",
+					"I can also be a doctor if need be."
+				]
+			},
+			{	job: "torchbearer", trades: {"torch": "bread"},
+				gossip: [
+					"The night is dark and full of terror.",
+					"I've seen monsters in the forest, but they always hide."
+				]
+			},
+			{	job: "baker", trades: {"bread": "grain"},
+				gossip: [
+					"There isn't a lot to eat around here, but everyone enjoys my bread.",
+					"I can't remember much about our old home."
+				]
+			},
+			{	job: "messenger", trades: {"tent": "bread"},
+				gossip: [
+					"I wish I knew how to use the moon gates.",
+					"I try to keep everyone informed and organized."
+				]
+			},
 			// builders
-			{job: "knitter", trades: {"coat": "wool"}}, 
-			{job: "torchmaker", trades: {"torch": "wood"}},
-			{job: "tentmaker", trades: {"tent": "hides"}},
-			{job: "shipwright", trades: {"boat": "wood"}},
+			{	job: "knitter", trades: {"coat": "wool"},
+				gossip: [
+					"The mountains are cold; you shouldn't go unprepared.",
+					"Most of us can't remember anything of our past."
+				]
+			}, 
+			{	job: "torchmaker", trades: {"torch": "wood"},
+				gossip: [
+					"I used to be a candlestickmaker, but now we rely on torches.",
+					"Only the mystics seem to understand the moon gates."
+				]
+			},
+			{	job: "tentmaker", trades: {"tent": "hides"},
+				gossip: [
+					"I've heard rumors about a mystical stone that can only be used by a hero.",
+					"We are all living in tents for now."
+				]
+			},
+			{	job: "shipwright", trades: {"boat": "wood"},
+				gossip: [
+					"Having your own ship is essential.",
+					"I've seen what looks like a shrine out in the sea."
+				]
+			},
 			// special
-			{job: "mystic", trades: {"moonstone": "enlightenment"}}
+			{
+				job: "mystic", trades: {"moonstone": "enlightenment"}, 
+				gossip: [
+					"Blue moon gates are for traveling around the world.",
+					"Legends say that red moon gates go to other dimensions.",
+					"Only virtuous people can use moonstones.",
+				]
+			}
 		];
 		let i = 0;
 		while (i < 40) {
 			let xy = o.getRandomLoc();
 			let jt = (i < jobTrades.length) ? jobTrades[i] : jobTrades[randInt(jobTrades.length) - 1];
-			o.npcs.push(new Character(o, xy.x, xy.y, "guy", jt.job, jt.trades));
+			let imgName = (randInt(2) == 1) ? "npc" : "villager";
+			if (jt.job == "mystic") { imgName = "mystic"; }
+			o.npcs.push(new Character(o, xy.x, xy.y, imgName, jt.job, jt.trades, jt.gossip));
 			i++;
 		}
 		o.allThings = o.allThings.concat(o.npcs);
@@ -116,7 +190,7 @@ class World {
 	}
 	getNearestThing(loc, near) {
 		let o = this;
-		let nearThing;
+		let nearThing = null;
 		near = near || Infinity;
 		o.allThings.forEach((thing) => {
 			let d = loc.getDistance(thing.loc);

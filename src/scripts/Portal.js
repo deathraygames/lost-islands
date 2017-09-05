@@ -10,11 +10,12 @@ class Portal extends Thing {
 		o.tpRange = 10;
 		o.tpDrop = o.tpRange * 1.5;
 		o.redCallback = function(){};
-		o.off = new GameImage("moongate");
-		o.onRed = new GameImage("moongate_red");
-		o.onBlue = new GameImage("moongate_blue");
-		o.img = o.off;
+		o.img = null;
 		o.minZoom = 0.5;
+		o.spriteSheet = new SpriteSheet("moongate_sheet", (s) => {
+			o.img = s[0];
+		});
+		
 	}
 	connect(allPortals) {
 		this.allPortals = allPortals;
@@ -61,7 +62,7 @@ class Portal extends Thing {
 	}
 	activate() {
 		let o = this;
-		o.img = o.onBlue;
+		o.img = o.spriteSheet.sprites[1];
 		o.mode = "blue";
 		let b = 0;
 		o.allPortals.forEach((p) => { if (p.mode == "blue") { b++; } });
@@ -70,7 +71,7 @@ class Portal extends Thing {
 	}
 	deactivate() {
 		let o = this;
-		o.img = o.off;
+		o.img = o.spriteSheet.sprites[0];
 		o.mode = false;
 		o.verb = "activate";
 	}
@@ -86,7 +87,7 @@ class Portal extends Thing {
 		}
 	}
 	activateRed() {
-		this.img = this.onRed;
+		this.img = this.spriteSheet.sprites[2];
 		this.mode = "red";
 	}
 }

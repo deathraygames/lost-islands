@@ -7,9 +7,9 @@ class Coords {
 	}
 	set(x,y) {
 		if (x instanceof Coords) {
-			coord.check();
-			this.x = coord.x;
-			this.y = coord.y;
+			x.check();
+			this.x = x.x;
+			this.y = x.y;
 		} else {
 			this.x = x;
 			this.y = y;

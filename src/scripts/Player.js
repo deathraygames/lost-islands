@@ -1,6 +1,6 @@
 class Player extends Character {
 	constructor(world, x, y) {
-		super(world, x, y, "hero");
+		super(world, x, y, "stranger");
 		let o = this;
 		o.type = "PC";
 		o.inventory = {"watch": true};
@@ -8,6 +8,5 @@ class Player extends Character {
 		o.discovered = 1;
 		o.name = "Stranger";
 		o.label = "";
-		o.walking = [o.guy, new GameImage("hero_walk_0"), o.guy, new GameImage("hero_walk_1")];
 	}
 }

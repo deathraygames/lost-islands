@@ -1,5 +1,5 @@
 {
-  "name": "Aelbahkat: The Lost Islands",
+  "name": "Aelbahkat",
   "version": "1.0.0",
   "description": "Exploration Game",
   "keywords": [
@@ -13,7 +13,7 @@
     "uglify-es": "^3.0.28"
   },
   "scripts": {
-    "min": "uglifyjs ./src/scripts/Coords.js ./src/scripts/rand.js ./src/scripts/GameImage.js ./src/scripts/Thing.js ./src/scripts/Character.js ./src/scripts/Player.js ./src/scripts/Shrine.js ./src/scripts/Portal.js ./src/scripts/World.js ./src/scripts/Screen.js ./src/scripts/Loop.js ./src/scripts/Game.js -o ./min/game.min.js",
+    "min": "uglifyjs ./src/scripts/Coords.js ./src/scripts/rand.js ./src/scripts/GameImage.js ./src/scripts/SpriteSheet.js ./src/scripts/Thing.js ./src/scripts/Character.js ./src/scripts/Player.js ./src/scripts/Shrine.js ./src/scripts/Portal.js ./src/scripts/World.js ./src/scripts/Screen.js ./src/scripts/Loop.js ./src/scripts/Game.js -o ./min/game.min.js",
     "copy-images": "copyfiles -f ./src/images/*.* ./min/images",
     "copy-styles": "copyfiles -f ./src/styles/*.* ./min/styles",
     "copy-index": "copyfiles -f ./src/index.html ./min",

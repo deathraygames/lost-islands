@@ -1,5 +1,5 @@
 class Character extends Thing {
-	constructor(world, x, y, f, job, trades) {
+	constructor(world, x, y, f, job, trades, gossip) {
 		super(world, x, y);
 		let o = this;
 		o.name = "Lost Person";
@@ -16,28 +16,57 @@ class Character extends Thing {
 		o.walkIndex = 0;
 		o.traveled = 0;
 		o.met = {};
-		f = f || "guy";
-		o.guy = new GameImage(f);
-		o.walking = [o.guy, o.guy, o.guy, o.guy];
-		o.slowed = new GameImage(f + "_slowed");
-		o.boat = new GameImage("boat");
-		o.swim = new GameImage("swim");
-		o.meditating = new GameImage("meditate");
-		o.tent = new GameImage("tent");
-		o.img = o.guy;
+		o.clarity = 0; // meditation progress 0-1
+		o.focus = {}; // what the character is targeting
 		o.inventory = {"boat": true, "tent": true, "water": true, "coat": true};
 		o.virtues = {};
 		o.virtueCount = 0;
 		o.alpha = 0;
-		o.askIndex = 0;
-		o.setImage();
+		o.askIndex = -1;
+		o.gossip = (gossip instanceof Array) ? gossip : [];
+		o.gossipIndex = -1;
+		o.busyCooldown = 0;
+		f = (f || "npc") + "_sheet";
+		o.walking = [];
+		o.spriteSheet = new SpriteSheet(f, (s) => {
+			o.walking = [s[0], s[1], s[0], s[2]];
+			o.setImage();
+		});
+		o.altSheet = new SpriteSheet("alt_sheet");
+		o.img = null;
+	}
+	live(t, isNight) {
+		let o = this;
+		t /= 20; // TODO: adjust this scale if we change the frequency of ticks
+		if (o.isMeditating) { o.meditate(t); }
+		let cooled = o.cooldown();
+		if (o.type == "NPC" && cooled) {
+			if (isNight) {
+				o.cancel();
+				o.camp();
+			} else if (randInt(5) == 1) {
+				o.wander();
+			} else {
+				o.move();
+			}			
+		}
+	}
+	cooldown() {
+		this.busyCooldown = Math.max((this.busyCooldown - 1), 0);
+		return (this.busyCooldown <= 0) ? true : false;
+	}
+	focusOnNearest() {
+		let o = this;
+		o.focus = o.world.getNearestThing(o.loc, o.getActionDistance());		
 	}
 	wander() {
+		if (!this.cooldown()) { return; }
 		let i = randInt(4) - 1;
 		this.move(i);
 	}
 	move(dir) {
 		let o = this;
+		if (!o.cooldown()) { return; }
 		let l = o.loc;
 		let s = o.getSpeed();
 		if (typeof dir === 'undefined') { dir = o.facing; }
@@ -93,16 +122,20 @@ class Character extends Thing {
 	}
 	setImage() {
 		let o = this;
+		let s = o.spriteSheet.sprites;
 		if (o.isMeditating) {
-			o.img = o.meditating;
+			o.img = o.altSheet.sprites[2];
 		} else if (o.isCamping) {
-			o.img = o.tent;
+			o.img = o.altSheet.sprites[3];
 		} else if (o.isOnWater()) {
-			o.img = (o.has("boat")) ? o.boat : o.swim;
+			o.img = o.altSheet.sprites[(o.has("boat")) ? 1 : 0];
 		} else if (o.getSpeed() < o.speed) {
-			o.img = o.slowed;
+			o.img = o.spriteSheet.sprites[3];
 		} else {
 			o.img = o.walking[o.walkIndex];
+		}
+		if (o.facing == 1 || o.facing == 2) {
+			o.img = o.img.flippedHorizontal;
 		}
 	}
 	setSight() {
@@ -190,18 +223,18 @@ class Character extends Thing {
 			o.cancel();
 			return;
 		}
-		let nearest = o.world.getNearestThing(o.loc, o.getActionDistance());
-		if (nearest) {
-			if (nearest instanceof Character) {
-				o.ask(nearest);
-			} else if (nearest instanceof Shrine) {
-				o.meditate(nearest);
-			} else if (nearest instanceof Portal) {
+		o.focusOnNearest();
+		if (o.focus) {
+			if (o.focus instanceof Character) {
+				o.ask(o.focus);
+			} else if (o.focus instanceof Shrine) {
+				o.toggleMeditate();
+			} else if (o.focus instanceof Portal) {
 				if (o.has("moonstone")) {
-					nearest.activateRed();
+					o.focus.activateRed();
 					o.speak("A transdimensional red moon gate!");
 				} else {
-					nearest.toggle();
+					o.focus.toggle();
 				}
 			}
 		} else {
@@ -216,47 +249,62 @@ class Character extends Thing {
 			o.setImage();
 		}
 	}
-	meditate(shrine) {
+	toggleMeditate() {
 		let o = this;
 		o.isMeditating = !o.isMeditating;
-		if (o.isMeditating) {
-			o.facing = -1;
-		}
-		if (o.isMeditating && shrine) {
-			o.virtues[shrine.virtue] = true;
-			o.label = "-" + shrine.mantra + "-";
+		if (!o.isMeditating) { o.cancel(); }
+		o.setImage();
+	}
+	meditate(t) {
+		let o = this;
+		let spk = "∞";
+		o.clarity += 0.001 * ((o.virtueCount/3) + 1) * t;
+		o.clarity = Math.min(1, o.clarity);
+		let clear = (o.clarity >= 1);
+		o.facing = -1;
+		
+		if (o.focus instanceof Shrine) {
+			spk = "-" + o.focus.mantra + "-";
+			if (clear) {
+				o.virtues[o.focus.virtue] = true;
+				spk = ["I know the wisdom", "of " + o.focus.virtue];
+			} else {
+				spk += " (" + Math.ceil(o.clarity * 100) + "%)";
+			}
 		}
 		o.virtueCount = 0;
 		for (let v in o.virtues) {
 			o.virtueCount++;
 		}
-		o.setImage();
 		if (o.virtueCount >= 8) {
 			o.inventory["enlightenment"] = true;
-			o.speak("I have gained enlightnment of all 8 virtues.");
+			spk = ["I have gained", "enlightnment of", "all 8 virtues."];
 		}
+		o.speak(spk);
 	}
 	cancel() {
 		let o = this;
 		o.isCamping = false;
 		o.isMeditating = false;
+		o.clarity = 0;
 		o.label = "";
 		o.setImage();
 	}
 	ask(char) {
 		let o = this;
+		let maxAskIndex = (char.gossip.length) ? 3 : 2;
 		o.cancel();
 		char.cancel();
 		o.askIndex++;
-		if (o.askIndex > 2) { o.askIndex = 0; }
+		if (o.askIndex > maxAskIndex) { o.askIndex = 0; }
 		if (o.askIndex == 0) {
 			//o.speak("Name?");
 			if (char.name == "Lost Person") { char.setRandomName(); }
-			char.speak("Name? I am " + char.name + ".");
+			char.speak(["Name?", "I am " + char.name + "."]);
 			o.met[char.name] = 1;
 		} else if (o.askIndex == 1) {
 			//o.speak("Job?");
-			char.speak("Job? I am a " + char.job + ".");
+			char.speak(["Job?", "I am a " + char.job + "."]);
 		} else if (o.askIndex == 2) {
 			let deal, demand, supply, dealSupply;
 			//o.speak("Trade?");
@@ -276,7 +324,12 @@ class Character extends Thing {
 			} else {
 				char.speak("I will trade " + demand + " for " + supply + ".");
 			}
+		} else if (o.askIndex == 3) {
+			char.gossipIndex++;
+			if (char.gossipIndex > (char.gossip.length - 1)) { char.gossipIndex = 0; }
+			char.speak(char.gossip[char.gossipIndex]);
 		}
+		char.busyCooldown = 10;
 	}
 	give(wut, whom) {
 		this.inventory[wut] = false;
@@ -287,6 +340,27 @@ class Character extends Thing {
 		this.give(give, whom);
 	}
 	speak(wut) {
+		let m = 20;
+		if (typeof wut == "string" && wut.length > m) {
+			let wArr = wut.split(" ");
+			let words = "";
+			wut = [];
+			wArr.forEach((w, i) => {
+				if (i == 0) {
+					words = w;
+				} else {
+					if (w.length + words.length < m) {
+						words += " " + w;
+					} else {
+						wut.push(words);
+						words = w;
+					}
+					if (i == (wArr.length - 1)) {
+						wut.push(words);
+					}				
+				}
+			});
+		}
 		this.label = wut;
 	}
 } 

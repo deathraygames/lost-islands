@@ -3,7 +3,6 @@
 <head>
 	<meta charset="utf-8">
 	<title>&AElig;LBAHKAT Exploration Game</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" href="styles/lost.css" />
 </head>
 <body>
@@ -12,6 +11,15 @@
 	<div class="sub">The Lost Islands</div>
 	<p class="credits">
 	By Luke @deathraygames for js13k 2017
+	</p>
+</div>
+<div id="intro">
+	<button type="button" id="beginButton">Begin Journey <span>[Enter]</span></button>
+	<p>
+		A cataclysm has shattered the known world and left islands adrift in the cosmos. Each island has only a handful of inhabitants, struggling to survive. All signs of civilization are gone, except for a few ancient shrines and stone gateways, and only the mystics seem to understand their signifigance.
+	</p>
+	<p>
+		You wake up on one of these islands as a Stranger, not remembering your past. Perhaps with some exploration and meditation you will be able to uncover a way home...
 	</p>
 </div>
 <div id="win" style="display:none">
@@ -50,11 +58,11 @@
 		</ul>
 	</div>	
 </div>
-
-
+<!-- <script src="game.min.js"></script> -->
 <script src="scripts/Coords.js"></script>
 <script src="scripts/rand.js"></script>
 <script src="scripts/GameImage.js"></script>
+<script src="scripts/SpriteSheet.js"></script>
 <script src="scripts/Thing.js"></script>
 <script src="scripts/Character.js"></script>
 <script src="scripts/Player.js"></script>
@@ -66,7 +74,7 @@
 <script src="scripts/Game.js"></script>
 <script>
 	var g = new Game();
-	g.start();
+	g.init();
 </script>
 </body>
 </html>

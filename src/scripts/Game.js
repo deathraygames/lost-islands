@@ -23,19 +23,23 @@ class Game {
 		o.screen.clear();
 		
 		o.pc.discover(o.screen.getBoundaries());
-
-		{
-			let nearest = o.world.getNearestThing(o.pc.loc, o.pc.getActionDistance());	
-			if (nearest) {
-				o.nameElt.innerHTML = nearest.name;
-				o.verbElt.innerHTML = "[E] " + nearest.verb;
-				o.nameElt.style.display = "block";
-				o.verbElt.style.display = "block";
-			} else {
-				o.nameElt.style.display = "none";
-				o.verbElt.style.display = "none";
-			}
+		o.pc.live(t);
+		o.pc.focusOnNearest();
+		if (o.pc.focus) {
+			o.nameElt.innerHTML = o.pc.focus.name;
+			o.verbElt.innerHTML = "[E] " + o.pc.focus.verb;
+			o.nameElt.style.display = "block";
+			o.verbElt.style.display = "block";
+		} else {
+			o.nameElt.style.display = "none";
+			o.verbElt.style.display = "none";
 		}
+
+		o.world.allThings.forEach((t) => {
+			t.selected = (t === o.pc.focus);
+			if (t instanceof Portal) { t.checkTeleport(o.pc); }
+		});
+		
 
 		if (o.invOpen) {
 			o.drawInventory();
@@ -44,18 +48,14 @@ class Game {
 		{
 			let i = randInt(o.world.npcs.length) - 1; // npc index
 			let npc = o.world.npcs[i];
-			if (o.isNighttime()) {
-				npc.camp();
-			} else if (randInt(5) == 1) {
-				npc.wander();
-			} else {
-				npc.move();
-			}
+			npc.live(t, o.isNighttime());
 		}
 
+		/*
 		o.world.portals.forEach((p) => {
 			p.checkTeleport(o.pc);
 		});
+		*/
 
 		let c = o.screen.ctx;
 		//if (ct) console.time("draw game loop");
@@ -106,33 +106,41 @@ class Game {
 			l = hr / 10;
 		}
 		if (o.pc.isMeditating) {
-			o.world.hue = [0,25,50];
+			o.world.hue = [-50,-100,50];
 		} else {
 			o.world.hue = [0,0,0];
 		}
 		o.world.light = Math.min(Math.max(l, 0.3), 1);
-
 	}
-	start() {
+	init() {
 		let o = this;
-		console.time("start setup");
+		console.time("init/setup");
 		console.log("%c☥", "font-size: 400%; color: yellow;", "\nStarting the game...");
 		o.setupDOM();
 		o.setupEvents();		
 		o.setupData();
-		console.timeEnd("start setup");
-		setTimeout(() => {
-			console.time("start launch");
-			o.screen.setup();
-			o.loop.start();
-			o.titleElt.style.display = "none";
-			o.invElt.style.display = "block";
-			o.invOpen = true;
-			o.loadingElt.style.display = "none";
-			o.bodyElt.style.display = "block";
-			o.pc.speak("Where am I? Lost in a foreign land...");
-			console.timeEnd("start launch");
-		}, 2000);
+		o.screen.setup();
+		console.timeEnd("init/setup");
+		setTimeout(() => { o.intro(); }, 200);
+	}
+	intro() {
+		let o = this;
+		o.loop.stop();
+		o.introElt.style.display = "block";
+		o.titleElt.style.display = "block";
+		o.loadingElt.style.display = "none";
+		o.bodyElt.style.display = "none";
+	}
+	beginAdventure() {
+		let o = this;
+		o.loop.start();
+		o.introElt.style.display = "none";
+		o.titleElt.style.display = "none";
+		o.invElt.style.display = "block";
+		o.loadingElt.style.display = "none";
+		o.bodyElt.style.display = "block";
+		o.invOpen = true;
+		o.pc.speak(["Where am I?", "Lost in a foreign land..."]);		
 	}
 	setupData() {
 		let o = this;
@@ -176,15 +184,25 @@ class Game {
 		o.winElt = o.elt("win");
 		o.virtueCountElt = o.elt("virtueCount");
 		o.peopleElt = o.elt("people");
+		o.introElt = o.elt("intro");
 	}
 	elt(id) {
 		return document.getElementById(id);
 	}
 	setupEvents() {
 		let o = this;
+		o.elt("beginButton").onclick = () => { o.beginAdventure(); }
 		document.addEventListener("keydown", (e) => {
 			e.pd = e.preventDefault;
 			switch(e.keyCode){
+				case 80: // p
+					o.intro();
+					e.pd();
+					break;
+				case 13: // enter
+					o.beginAdventure();
+					e.pd();
+					break;
 				case 37: // left
 				case 65: // a
 					o.pc.move(3);
@@ -222,7 +240,7 @@ class Game {
 					e.pd();
 					break;
 				case 77: // m
-					o.pc.meditate();
+					o.pc.toggleMeditate();
 					e.pd();
 					break;
 				case 27: // esc
