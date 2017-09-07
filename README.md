@@ -19,8 +19,8 @@ Originally made for js13k competition 2017 over the course of about 2 weeks
 * See all the entries for the competition at http://2017.js13kgames.com/
 
 Play it:
-* [v1.0 (13k)](deathraygames.com/play-online/lost-islands/13k/)
-* [Latest version](deathraygames.com/play-online/lost-islands/)
+* [v1.0 (13k)](http://deathraygames.com/play-online/lost-islands/13k/)
+* [Latest version](http://deathraygames.com/play-online/lost-islands/)
 
 Size:
 * Source: 43.3 KB (44,367 bytes)
