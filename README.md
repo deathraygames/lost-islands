@@ -11,6 +11,12 @@ Retro-inspired exploration game made for the js13k game jam competition 2017
 * NPCs that can be traded with
 * Various trade items and travel-enhancing items
 
+## Play it
+
+* [v1.0 (13k) on js13kgames.com](https://js13kgames.com/2017/games/aelbahkat-the-lost-islands)
+* [v1.0.1 on itch.io](https://deathray.itch.io/aelbahkat-the-lost-islands)
+* [Latest version (GitHub)](https://deathraygames.github.io/lost-islands)
+
 ## Version 1.0 Submission for js13k 2017
 
 Originally made for js13k competition 2017 over the course of about 2 weeks
@@ -27,8 +33,4 @@ Size:
 * Minified: 29.7 KB (30,433 bytes)
 * Minified and Zipped: 12.9 KB (13,221 bytes) - _91 bytes free!_
 
-Play it:
-* [v1.0 (13k)](http://deathraygames.com/play-online/lost-islands/13k/)
-* [Latest version](http://deathraygames.com/play-online/lost-islands/)
-
-&copy; 2017, Code released under the MIT License
+&copy; 2017-2025, Code released under the MIT License

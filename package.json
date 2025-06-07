@@ -1,15 +1,17 @@
 {
-  "name": "Aelbahkat",
-  "version": "1.0.0",
+  "name": "aelbahkat",
+  "version": "1.0.1",
   "description": "Exploration Game",
   "keywords": [
-    "js13k", "rpg"
+    "js13k",
+    "rpg"
   ],
   "author": "Luke Nickerson",
   "license": "MIT",
   "devDependencies": {
     "bestzip": "^1.1.4",
     "copyfiles": "^1.2.0",
+    "http-server": "^14.1.1",
     "uglify-es": "^3.0.28"
   },
   "scripts": {
@@ -17,6 +19,7 @@
     "copy-images": "copyfiles -f ./src/images/*.* ./min/images",
     "copy-styles": "copyfiles -f ./src/styles/*.* ./min/styles",
     "copy-index": "copyfiles -f ./src/index.html ./min",
-    "zip": "bestzip js13k_bundle.zip ./min/*"
+    "zip": "bestzip js13k_bundle.zip ./min/*",
+    "serve": "npx http-server"
   }
 }
